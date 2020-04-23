@@ -8,19 +8,3 @@
 包括 IO 等，都是在这个包里
 * ![](1.PNG)
 * 开始学习！
-
-## java.sql.*
-### interface summary
-```java
-
-package java.sql;
-
-/**
-* 在 Java 程序中，使用的 SQL 类型的数组映射（也许就是 SQL 类型，它的数组，但是什么时候使用呢）
-* 在默认情况下，该对象的值就是事物期间 SQL 数组的引用。
-*/
-
-public interface Array {
-
-}
-```
