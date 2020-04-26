@@ -162,10 +162,21 @@ public class SimpleService implements ISimpleService {
      * 去直接更改 Connection 的配置。默认情况下，Connection 对象会在会话执行之后自动提交
      * 如果不是自动提交模式，则需要去显示的提交数据。否则数据不会被保存
      *
+     * #Connection.getTypeMap() 这个方法返回一个 Map，是不是 SQL 类型和 JAVA 类型的映射呢？
+     *
+     *
+     * 核心代码分析：
+     *
+     *
+     * // 创建一个可以发送 SQL 语句的对象。没有参数的 SQL 语句可以通过该对象执行，但是建议使用
+     * PreparedStatement 去执行有参数的语句
+     * Statement createStatement() throws SQLException;
+     *
+     *
      */
 
     @Override
     public void connection(Connection connection) throws Exception {
-        System.err.println(connection.getAutoCommit());
+        System.err.println(connection.getTypeMap());
     }
 }
