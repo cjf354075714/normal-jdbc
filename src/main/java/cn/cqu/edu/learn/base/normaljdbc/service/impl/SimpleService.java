@@ -162,15 +162,109 @@ public class SimpleService implements ISimpleService {
      * 去直接更改 Connection 的配置。默认情况下，Connection 对象会在会话执行之后自动提交
      * 如果不是自动提交模式，则需要去显示的提交数据。否则数据不会被保存
      *
-     * #Connection.getTypeMap() 这个方法返回一个 Map，是不是 SQL 类型和 JAVA 类型的映射呢？
+     * 使用 JDBC 核心 API 获取的 Connection 对象，会带着一个初始化的空的联带 Map 对象。
+     * 程序员可以使用自己的映射 UDT，放在这个 Map 中
+     * UDT 什么是 UDT，我自己理解，就是数据库表字段类型和 JAVA 数据类型的映射关系
+     * 当我们执行 SQL 查询之后，ResultSet.getObject 去获取数据时，会先判断有没有我们自定义的数据映射关系
+     * 有的话，就使用，没有的话，就使用标准的映射关系，这里就需要我们去判断了
+     *
+     * 比如，我 SQL 查询一个表，这个表就是一个 JAVA 实体。如果直接查询，使用这种方法，是不是就直接返回实体呢？
+     *
+     * Map<String, Class<?>> map = connect.getTypeMap();
+     * map.put("myEntityName", Class.forName("myEntityName.path"));
+     * map.setTypeMap(map);
+     *
+     * 核心方法：
      *
      *
-     * 核心代码分析：
-     *
-     *
-     * // 创建一个可以发送 SQL 语句的对象。没有参数的 SQL 语句可以通过该对象执行，但是建议使用
-     * PreparedStatement 去执行有参数的语句
+     * 创建并返回一个可以执行 SQL 的 Statement 对象
+     * 没有 SQL 参数的执行请求，一般都是使用 Statement 对象
+     * 如果相同的 SQL 会被执行多次，使用 PreparedStatement 对象也许会有性能上的提升
      * Statement createStatement() throws SQLException;
+     *
+     * Statement 是使用默认的类型 TYPE_FORWARD_ONLY 和默认的并发等级 CONCUR_READ_ONLY
+     * 去返回一个 ResultSet
+     *
+     * 这两个参数，放在 ResultSet 上去看
+     *
+     * ResultSet 的可保存性，可以通过 getHoldability 方法返回
+     * Statement createStatement() throws SQLException;
+     *
+     *
+     *
+     * 创建一个 PreparedStatement 对象，没有参数和有参数的 SQL 能够被预编译和存储到该对象中
+     * 这个对象能够被多次使用，这里的多次使用我没看懂
+     * 有些驱动不支持 SQL 的预编译，如果支持预编译，则驱动会将 SQL 发送到数据库去执行预编译。
+     * 如果不支持，就不会发送，这个区别对于开发人员来说是没有的，但是会抛出异常。
+     * 同步级别和游标行为和 createStatement 相同
+     * 这里需要传递一个 String 参数。就是 SQL 的字符串，在里面，有很多 ‘？’，用于字符串的替换符
+     *
+     * PreparedStatement prepareStatement(String sql)
+     *         throws SQLException;
+     *
+     *
+     * 存储过程涉及到的创建方法，和预编译一样，都是将 SQL 发送到数据库，然后执行
+     * 存储过程并不直接在参数中去写，只是我们在数据库中写好了之后，再去调用
+     * 这里我先不看了
+     * CallableStatement prepareCall(String sql) throws SQLException;
+     *
+     *
+     * 该方法就是 SQL 的翻译，比如将 Oracle 翻译成 Mysql，
+     * 但是我没有测试过，也许是可用
+     * 那么，将方言翻译成那个版本的 SQL 呢，应该是我这个 Connection 是怎么来的
+     * 就是来自哪个驱动，就翻译成哪个驱动的方言
+     *
+     * String nativeSQL(String sql) throws SQLException;
+     *
+     *
+     * 设置事物是否自动提交，本质上 JDBC 去执行 SQL 都是以事物的方式
+     * DML DDL 在执行完毕之后，会在不同的时间点上，去提交事物
+     * 默认获取的 Connection 对象都是自动提交的
+     * 以后我要是获取链接，主动去设置好，不自动提交事物
+     * void setAutoCommit(boolean autoCommit) throws SQLException;
+     *
+     * 获取是否自动提交
+     * boolean getAutoCommit() throws SQLException;
+     *
+     *
+     * 提交上一次的所有更改和回滚，我这里不明白，啥叫提交回滚，是不是我回滚之后
+     * 还要去提交一次呢？提交完毕之后，会释放该链接对于该数据库的锁
+     * 1，这是什么锁？行锁、表锁还是什么
+     * 2，什么时候去获取的锁呢？
+     * void commit() throws SQLException;
+     *
+     *
+     * 回滚上次的所有更改，并释放所有锁
+     * void rollback() throws SQLException;
+     *
+     * 释放该对象所拥有的 JDBC 和数据库的所有资源，立马释放，而不是等待事物提交完毕之后
+     * 所以，在异常中，就需要去释放，也就是 close
+     * 现在，这些对象，基本都实现了 AutoCloseable 接口，在虚拟机回收的时候
+     * 发现实现了该接口，那就自动去调用 close()
+     * void close() throws SQLException;
+     *
+     *
+     * 返回，该对象是否被关闭了，具体在什么时候调用，没时间看了
+     * boolean isClosed() throws SQLException;
+     *
+     * 检索一个 DatabaseMetaData 对象，这个对象就是该数据库链接的元数据信息、
+     * 比如，有哪些 table 啊，所支持的 SQL 编译器啊，存储过程等
+     * DatabaseMetaData getMetaData() throws SQLException;
+     *
+     * 设置该连接对象只可读，不可写
+     * void setReadOnly(boolean readOnly) throws SQLException;
+     * boolean isReadOnly() throws SQLException;
+     *
+     * 设置当前数据库的访问链接的数据库名
+     * 比如，我这个数据库链接有五个数据库，我通过这个方法就可以去设置
+     * 这个似乎就达到了，切换数据库链接的目的，现在还没有测试，那就先留着
+     * void setCatalog(String catalog) throws SQLException;
+     * String getCatalog() throws SQLException;
+     *
+     *
+     *
+     * 接下来是，数据库隔离级别的学习
+     *
      *
      *
      */

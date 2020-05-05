@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverAction;
-import java.sql.DriverManager;
+import java.sql.*;
 
 @SpringBootTest
 class NormalJdbcApplicationTests {
@@ -23,7 +21,7 @@ class NormalJdbcApplicationTests {
     void contextLoads() {
         try {
             System.setProperty("jdbc.drivers", "com.mysql.cj.jdbc.Driver");
-            DriverManager.setLogWriter(new PrintWriter(System.err));
+            DriverManager.setLogWriter(new PrintWriter(System.out));
             Connection connection = DriverManager.getConnection("" +
                     "jdbc:mysql://localhost:3306/" +
                     "feng?" +
@@ -32,8 +30,10 @@ class NormalJdbcApplicationTests {
                     "&useUnicode=true" +
                     "&characterEncoding=utf-8" +
                     "&serverTimezone=GMT%2B8");
-
-            simpleService.connection(connection);
+            String preSql = "insert into student values(?, ?, ?)";
+            connection.setCatalog("mysql");
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
+            System.err.println(connection.getCatalog());
         } catch (Exception e) {
             e.printStackTrace();
         }
