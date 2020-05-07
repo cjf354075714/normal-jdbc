@@ -335,7 +335,14 @@ public class SimpleService implements ISimpleService {
      *
      * 接着分析，如何来取决这个一致性和隔离性的取舍问题
      * 自然，隔离得越远；那肯定数据就越安全，一致性就一定越高
+     * 隔离的等级有四个：
+     * 读未提交：READ_UNCOMMITED 什么都没解决
+     * 读已提交：READ_COMMITED 解决了脏读
+     * 可重复读：REPEATABLE_READ 解决了不可重复读
+     * 串行化：SERIALIZABLE 解决了任何形势的数据不安全问题，解决了幻读
      *
+     * 这些隔离级别，他是如何实现的？用什么锁？
+     * 悲观锁、乐观锁、共享锁、排它锁
      *
      */
 
