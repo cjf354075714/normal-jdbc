@@ -6,6 +6,11 @@ import org.springframework.stereotype.Service;
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+
+/**
+ * 待看的知识点
+ * ResultSet 的游标、可见性
+ */
 @Service("simpleService")
 public class SimpleService implements ISimpleService {
 
@@ -390,6 +395,11 @@ public class SimpleService implements ISimpleService {
      * // 获取 Connection 的时候，数据库返回的异常
      * SQLWarning getWarnings() throws SQLException;
      *
+     * // 设置该对象得到的 ResultSet 的可见性等级，可见性等级有什么用？
+     * void setHoldability(int holdability) throws SQLException;
+     *
+     * // 获取可见性
+     * int getHoldability() throws SQLException;
      */
 
     @Override

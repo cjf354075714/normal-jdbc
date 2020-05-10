@@ -30,10 +30,9 @@ class NormalJdbcApplicationTests {
                     "&useUnicode=true" +
                     "&characterEncoding=utf-8" +
                     "&serverTimezone=GMT%2B8");
-            String preSql = "insert into student values(?, ?, ?)";
-            connection.setCatalog("mysql");
-            DatabaseMetaData databaseMetaData = connection.getMetaData();
-            System.err.println(connection.getCatalog());
+            String preSql = "insert into student(`id`, `name`, `age`) values(?, ?, ?)";
+            Statement pre = connection.prepareStatement(preSql);
+            System.err.println(connection.getHoldability());
         } catch (Exception e) {
             e.printStackTrace();
         }
