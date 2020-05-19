@@ -9,7 +9,7 @@ import java.sql.DriverManager;
 
 /**
  * 待看的知识点
- * ResultSet 的游标、可见性
+ * ResultSet 的游标、可见性、abort方法
  */
 @Service("simpleService")
 public class SimpleService implements ISimpleService {
@@ -400,10 +400,57 @@ public class SimpleService implements ISimpleService {
      *
      * // 获取可见性
      * int getHoldability() throws SQLException;
+     *
+     *
+     * // 设置一个 SavePoint，SavePoint 这个概念是数据库中的
+     * 本质上是一个事务运行过程中，它的一个状态，比如：
+     * 开启事务：
+     * insert 1
+     * insert 2
+     * save point a
+     * delete 3
+     * save point b
+     * roll back savepoint a
+     * 则数据库就回滚到 insert 2 之后的状态，这个比较简单
+     * 但是，我们在 mybatis spring 中如何去设置呢？
+     * rollback 可以直接指定返回到那哪个 SavePoint
+     * 还有什么，release 等等
+     * Savepoint setSavepoint() throws SQLException;
+     *
+     * createClob createBlob createNClob 等方法，本质上都是去设置数据库字段类型的
+     * 我们不需要关心这些，因为现在数据库都不存储大数据了，都是存链接，知道有这个概念就行
+     *
+     *
+     * 创建一个 SQLXML 对象，因为现在数据里面可以存 XML 了
+     * 这个我们也不需要去看了，知道就行
+     * SQLXML createSQLXML();
+     *
+     *
+     * // 在 timeout 秒内，返回该链接是否可用，记住这个方法
+     * boolean isValid(int timeout);
+     *
+     * setClientInfo、getClientInfo 用来设置客户端信息，记住就行了
+     *
+     * Array createArrayOf() Struct createStruct 两个方法都是为数据库
+     * 提供的特殊结构的方法，知道就行了
+     *
+     * setSchema() getSchema() 设置获取数据库中的 Schema
+     * Schema 是数据库中的概念，比如，表结构，视图等其他结构的定义 String
+     *
+     * // 我明白倒是明白，但是我不知道这个 executor，哪来啊？
+     * void abort(Executor executor) 终止一个链接对象
+     *
+     * setNetworkTimeout、getNetworkTimeout 设置链接超时时间，知道就行
+     *
+     * 至此，Connection 学习完了
      */
 
     @Override
     public void connection(Connection connection) throws Exception {
         System.err.println(connection.getTypeMap());
     }
+
+
+
+
 }
