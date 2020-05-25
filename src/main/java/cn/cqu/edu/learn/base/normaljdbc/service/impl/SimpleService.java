@@ -3,8 +3,10 @@ package cn.cqu.edu.learn.base.normaljdbc.service.impl;
 import cn.cqu.edu.learn.base.normaljdbc.service.ISimpleService;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 
 
 /**
@@ -451,6 +453,74 @@ public class SimpleService implements ISimpleService {
     }
 
 
+    /**
+     * ResultSet 这个对象，代表着数据库中表的数据，通常是执行 Statement
+     * 来返回这个对象
+     * ResultSet 在初始化之后，会自带一个游标指针，该指针初始化指向第一行数据的前面
+     * ResultSet 还有一个 next 方法，会将游标下一一行，然后，返回是否移动成功
+     * 如果是最后一行，则返回 false，我们可以使用这个方法，在 while 中进行迭代
+     * 默认的 ResultSet 对象是不可更新的，且游标只能向下移动，只能从第一行移动到最后一行
+     * 当然也可以创建可滚动的和可更新的 ResultSet 对象。
+     * @param resultSet resultSet
+     * @throws Exception Exception
+     *
+     *
+     * 知识点1：
+     * 游标的上下滚动
+     * 获取数据的可更新性
+     *
+     * 首先，游标是可以上下滚动的，默认是从上往下滚动，但是，在滚动的过程中，可以设定
+     * 是否去关注，其他人更新了某一行数据，比如，我去更新了第 x 行数据，他刚好就移动
+     * 到 x 行，TYPE_SCROLL_INSENSITIVE 就表示，不需要去获取这个更新，游标有三个等级
+     *
+     * TYPE_FORWARD_ONLY 游标只能从上往下移动
+     * TYPE_SCROLL_INSENSITIVE 游标任意滚动，但是对数据的更改不敏感
+     * TYPE_SCROLL_SENSITIVE 游标任意滚动，且关注数据的更改
+     *
+     * ResultSet 接口，提供很多 get 方法，用于获取每一行的数据，建议使用行索引的方式
+     * 他们的效率更高。列索引从 1 开始一直到列数的最大值，每一列应该被阅读于一次，且顺序是从左到右
+     *
+     * ResultSet 自己负责数据库和 JAVA 类型的映射
+     *
+     * JDBC 2.0 在 ResultSet 中提供了更新列函数，和新增列函数
+     * 当然，是更新到数据库中的，且游标的类型应该是上下移动，对数据更改敏感
+     *
+     * 更新列：
+     *
+     *  rs.absolute(5); // moves the cursor to the fifth row of rs
+     *  rs.updateString("NAME", "AINSWORTH"); // updates the <code>NAME</code> column of row 5 to be <code>AINSWORTH</code>
+     *  rs.updateRow(); // updates the row in the data source
+     *
+     * 新增列：新增列有点不同的是，它需要先移动到插入到的行，然后去更新这一行，最后，去插入
+     *
+     * rs.moveToInsertRow(); // moves cursor to the insert row
+     * rs.updateString(1, "AINSWORTH"); // updates the first column of the insert row to be <code>AINSWORTH</code>
+     * rs.updateInt(2,35); // updates the second column to be <code>35</code>
+     * rs.updateBoolean(3, true); // updates the third column to <code>true</code>
+     * rs.insertRow();
+     * rs.moveToCurrentRow();
+     *
+     * 没了，这个对象没啥值钱的了
+     *
+     */
+    @Override
+    public void resultSet(ResultSet resultSet) throws Exception {
+
+    }
 
 
+    /**
+     * DataSource 对象，是 SQL 协议的标准接口，主要是只是来获取 Connection 对象
+     * 具体的数据库厂商去实现这个接口，有三种比奥准的实现
+     *
+     * 1, 简单的 Connection 对象获取，它和 DriverManager 的 Connection 获取是一致的
+     * 2，典型的资源池管理方式，获取多个 Connection，存在内存中的，用完之后直接返回，并不关闭（怎么返回呢？）
+     * 3，分布式事务的 Connection 获取，一个 Connection 可以访问多个数据库
+     * @param dataSource dataSource
+     * @throws Exception Exception
+     */
+    @Override
+    public void dataSource(DataSource dataSource) throws Exception {
+
+    }
 }
