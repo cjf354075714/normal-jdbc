@@ -3,7 +3,10 @@ package cn.cqu.edu.learn.base.normaljdbc.service.impl;
 import cn.cqu.edu.learn.base.normaljdbc.service.ISimpleService;
 import org.springframework.stereotype.Service;
 
+import javax.sql.CommonDataSource;
+import javax.sql.ConnectionPoolDataSource;
 import javax.sql.DataSource;
+import javax.sql.PooledConnection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -452,6 +455,21 @@ public class SimpleService implements ISimpleService {
         System.err.println(connection.getTypeMap());
     }
 
+    /**
+     * 一个能够被重复使用的物理数据库链接对象
+     * 当应用调用 DataSource.getConnection 的时候，如果 ConnectionPoolDataSource
+     * 已经准备好了，则驱动会返回 Connection 对象，然后将这个对象，转化成 PooledConnection
+     *
+     * 当调用 Connection.close 方法的时候，链接管理池就会被通知到，因为，管理池对象已经把自己
+     * 注册成一个监听器，通过 addConnectionEventListener 方法，就是说，关闭的时候，管理者回去
+     * 自动将该对象，返回到连接池中，而不是自动关闭
+     * @param pooledConnection pooledConnection
+     * @throws Exception Exception
+     */
+    @Override
+    public void pooledConnection(PooledConnection pooledConnection) throws Exception {
+
+    }
 
     /**
      * ResultSet 这个对象，代表着数据库中表的数据，通常是执行 Statement
@@ -508,6 +526,28 @@ public class SimpleService implements ISimpleService {
 
     }
 
+    /**
+     * CommonDataSource 是 JAVA DataSource 这个概念中的顶级父类
+     * 就是说，有很多 DataSource 他们有共同的父接口，这个接口里面就是去设置打印流的
+     * 所以，你看啊，以前的 JAVA 还没有日志流，只能用输出流了
+     * @param commonDataSource commonDataSource
+     * @throws Exception Exception
+     */
+    @Override
+    public void commonDataSource(CommonDataSource commonDataSource) throws Exception {
+
+    }
+
+    /**
+     * 这个对象，是 PooledConnection 的工厂类
+     * 这个数据库链接对象，有些不一样，是可以重用的，具体应该看 PooledConnection 这个类
+     * @param connectionPoolDataSource connectionPoolDataSource
+     * @throws Exception Exception
+     */
+    @Override
+    public void connectionPoolDataSource(ConnectionPoolDataSource connectionPoolDataSource) throws Exception {
+
+    }
 
     /**
      * DataSource 对象，是 SQL 协议的标准接口，主要是只是来获取 Connection 对象
