@@ -1,8 +1,5 @@
 package cn.cqu.edu.learn.base.normaljdbc.entity.jdbc.pool;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import javax.sql.ConnectionEvent;
 import javax.sql.ConnectionEventListener;
 import javax.sql.PooledConnection;

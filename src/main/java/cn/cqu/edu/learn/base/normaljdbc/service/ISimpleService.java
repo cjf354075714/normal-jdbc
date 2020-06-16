@@ -1,5 +1,7 @@
 package cn.cqu.edu.learn.base.normaljdbc.service;
 
+import com.alibaba.druid.pool.DruidDataSource;
+
 import javax.sql.CommonDataSource;
 import javax.sql.ConnectionPoolDataSource;
 import javax.sql.DataSource;
@@ -26,4 +28,6 @@ public interface ISimpleService {
     void connectionPoolDataSource(ConnectionPoolDataSource connectionPoolDataSource) throws Exception;
 
     void dataSource(DataSource dataSource) throws Exception;
+
+    void druidDataSource(DruidDataSource druidDataSource) throws Exception;
 }

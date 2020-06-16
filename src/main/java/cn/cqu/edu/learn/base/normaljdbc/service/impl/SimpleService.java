@@ -1,6 +1,7 @@
 package cn.cqu.edu.learn.base.normaljdbc.service.impl;
 
 import cn.cqu.edu.learn.base.normaljdbc.service.ISimpleService;
+import com.alibaba.druid.pool.DruidDataSource;
 import org.springframework.stereotype.Service;
 
 import javax.sql.CommonDataSource;
@@ -561,6 +562,22 @@ public class SimpleService implements ISimpleService {
      */
     @Override
     public void dataSource(DataSource dataSource) throws Exception {
+
+    }
+
+    /**
+     * druidDataSource 是典型的生产者消费者的模式应用
+     * 只是，这里面有很多参数的构建，还有很多 Filter 的应用
+     * 本质上用的是可重入锁的应用
+     *
+     * 至于参数配置啊，怎么使用啊，后面说
+     * 接着，Mybatis 才是重点
+     * @see java.util.concurrent.locks.ReentrantLock
+     * @param druidDataSource druidDataSource
+     * @throws Exception Exception
+     */
+    @Override
+    public void druidDataSource(DruidDataSource druidDataSource) throws Exception {
 
     }
 }
