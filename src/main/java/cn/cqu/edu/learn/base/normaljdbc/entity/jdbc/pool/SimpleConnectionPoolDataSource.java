@@ -10,6 +10,8 @@ import java.io.PrintWriter;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.text.MessageFormat;
+import java.util.Properties;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,6 +54,30 @@ public class SimpleConnectionPoolDataSource implements ConnectionPoolDataSource,
                 throwables.printStackTrace();
             }
         }
+    }
+
+    public SimpleConnectionPoolDataSource(Properties properties) {
+        String driver = properties.getProperty("driver");
+        String url = properties.getProperty("url");
+        String username = properties.getProperty("username");
+        String password = properties.getProperty("password");
+        String templateUrl = "{0}user={1}password={2}";
+        int poolSize = Integer.parseInt(properties.getProperty("size"));
+        String factUrl = MessageFormat.format(templateUrl, url, username, password);
+
+        System.setProperty("jdbc.drivers", driver);
+        DriverManager.setLogWriter(new PrintWriter(System.out));
+
+        pool = new Stack<>();
+
+        for (int i = 0; i < poolSize; i++) {
+            try {
+                pool.push(new SimplePooledConnection(DriverManager.getConnection(factUrl), this));
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        }
+
     }
 
     @Override
